@@ -1,0 +1,19 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+      <h1>Dashboard</h1>
+      <p>Welcome, {{ username }}!</p>
+      <p>Your role: <span class="role-badge">{{ userRole }}</span></p>
+      <div class="actions">
+        <!-- Always visible buttons -->
+        <button class="btn btn-primary">My Profile</button>
+        <button class="btn btn-primary">Settings</button>
+
+        <!-- Only visible if user is Admin -->
+        <button *ngIf="isAdmin" class="btn btn-admin" (click)="goToUserManagement()">
+          👥 User Management
+        </button>
+
+        <button class="btn btn-secondary" (click)="logout()">Logout</button>
+      </div>
+  </div>
+</div>
