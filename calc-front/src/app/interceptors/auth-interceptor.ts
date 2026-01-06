@@ -1,6 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Auth } from '../services/auth';
+import { catchError, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(Auth);
@@ -15,5 +16,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  return next(req);
+  // ✅ Add error handling and logging
+  return next(req).pipe(
+    catchError((error) => {
+      console.error('❌ HTTP Error:', error);
+      return throwError(() => error);
+    })
+  );
 };

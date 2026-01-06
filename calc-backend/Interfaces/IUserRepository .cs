@@ -11,7 +11,7 @@ namespace CalculatorAPI.Interfaces
         Task<UserModel?> GetByUsernameAsync(string username);
         Task<bool> IsUsernameUniqueAsync(string username);
         Task<UserModel?> GetByIdAsync(int id);
-
+        Task<IEnumerable<UserModel>> GetAllAsync();
         Task<UserModel?> FindAsync(Expression<Func<UserModel, bool>> predicate);
 
     }

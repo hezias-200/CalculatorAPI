@@ -25,8 +25,6 @@ export class Dashboard implements OnInit {
     this.username = this.authService.getUsername() || 'User';
     this.isAdmin = this.authService.isAdmin(this.authService.getToken() || '');
     this.userRole = this.authService.getUserRole(this.authService.getToken() || '') || '';
-    console.log('Is Admin:', this.isAdmin);
-    console.log('User Role:', this.userRole);
   }
 
   logout(): void {

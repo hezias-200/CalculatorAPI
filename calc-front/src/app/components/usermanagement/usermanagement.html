@@ -1,0 +1,72 @@
+<div class="user-management-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Back to Dashboard</button>
+    <h1>👥 User Management</h1>
+    <p class="subtitle">Manage all system users</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" style="color: red; padding: 20px;">
+    {{ error }}
+  </div>
+
+  <!-- Table - NO loading check, just show if users exist -->
+  <div *ngIf="users.length > 0">
+    <h3 style="color: green; padding: 20px;">✅ Found {{ users.length }} users!</h3>
+    
+    <table style="width: 100%; border-collapse: collapse; border: 2px solid #667eea;">
+      <thead>
+        <tr style="background: #667eea; color: white;">
+          <th style="padding: 15px; border: 1px solid white;">ID</th>
+          <th style="padding: 15px; border: 1px solid white;">Username</th>
+          <th style="padding: 15px; border: 1px solid white;">Role</th>
+          <th style="padding: 15px; border: 1px solid white;">Status</th>
+          <th style="padding: 15px; border: 1px solid white;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users" style="border: 1px solid #ddd;">
+          <td style="padding: 10px; border: 1px solid #ddd;">{{ user.id }}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">👤 {{ user.username }}</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">
+            <span [ngClass]="getRoleBadgeClass(user.role)" 
+                  style="padding: 4px 8px; border-radius: 4px; background: #f0f0f0;">
+              {{ user.role }}
+            </span>
+          </td>
+          <td style="padding: 10px; border: 1px solid #ddd;">
+            <span [ngClass]="getStatusBadgeClass(user.isActive)"
+                  style="padding: 4px 8px; border-radius: 4px;"
+                  [style.background]="user.isActive ? '#d4edda' : '#f8d7da'"
+                  [style.color]="user.isActive ? '#155724' : '#721c24'">
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td style="padding: 10px; border: 1px solid #ddd;">
+            <button (click)="deleteUser(user.username)" 
+                    [disabled]="!user.isActive"
+                    style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              🗑️ Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Stats -->
+    <div style="margin-top: 30px; padding: 20px; background: #f5f7fa; border-radius: 8px;">
+      <h4>Statistics:</h4>
+      <p><strong>Total Users:</strong> {{ users.length }}</p>
+      <p><strong>Active Users:</strong> {{ activeUsersCount }}</p>
+      <p><strong>Admins:</strong> {{ adminUsersCount }}</p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="users.length === 0 && !error" style="text-align: center; padding: 60px;">
+    <div style="font-size: 64px;">📭</div>
+    <h3>No Users Found</h3>
+    <p>Waiting for data...</p>
+    <p style="color: #999;">users.length = {{ users.length }}</p>
+  </div>
+</div>

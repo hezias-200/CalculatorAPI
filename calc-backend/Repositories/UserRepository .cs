@@ -42,7 +42,12 @@ namespace CalculatorAPI.Repositories
         {
             return await _context.Users.FindAsync(id);
         }
-
+        public async Task<IEnumerable<UserModel>> GetAllAsync()
+        {
+            return await _context.Users
+                .OrderBy(u => u.Username)
+                .ToListAsync();
+        }
         public virtual async Task<UserModel?> FindAsync(Expression<Func<UserModel, bool>> predicate)
         {
             return await _context.Users.FirstOrDefaultAsync(predicate);

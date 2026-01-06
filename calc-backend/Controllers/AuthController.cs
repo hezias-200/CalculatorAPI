@@ -115,6 +115,22 @@ namespace CalculatorAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        [HttpGet("users")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userRepository.GetAllAsync();
+
+            var userDtos = users.Select(u => new
+            {
+                id = u.Id,
+                username = u.Username,
+                role = u.Role,
+                isActive = u.IsActive
+            });
+
+            return Ok(userDtos);
+        }
 
         private string HashPassword(string password)
         {
