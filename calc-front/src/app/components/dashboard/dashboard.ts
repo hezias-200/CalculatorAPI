@@ -34,4 +34,7 @@ export class Dashboard implements OnInit {
   goToUserManagement(): void {
     this.router.navigate(['/user-management']);
   }
+    goToResumeAnalyzer(): void {
+    this.router.navigate(['/resume-analyzer']);
+  }
 }

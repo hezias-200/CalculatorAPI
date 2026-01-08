@@ -1,0 +1,90 @@
+<div class="chat-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <button class="btn-back" (click)="goBack()">←</button>
+    <div class="header-title">
+      <h2>🤖 AI Resume Analyzer</h2>
+      <span class="status">Online</span>
+    </div>
+    <button class="btn-history" (click)="showHistory = !showHistory">
+      📜 History
+    </button>
+  </div>
+
+  <!-- Chat Messages -->
+  <div class="chat-messages">
+    <div *ngFor="let msg of messages" 
+         [class]="'message message-' + msg.type">
+      <div class="message-bubble">
+        <div class="message-content" [innerHTML]="msg.content | formatMessage"></div>
+        <div class="message-time">{{ msg.timestamp | date:'short' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="chat-input-area">
+    <!-- File Upload (Step 1) -->
+    <div *ngIf="step === 'file'" class="upload-zone">
+      <label class="file-label">
+        <input type="file" 
+               accept=".pdf" 
+               (change)="onFileSelected($event)"
+               hidden>
+        <span>📎 Upload PDF Resume</span>
+      </label>
+    </div>
+
+    <!-- Text Input (Step 2) -->
+    <div *ngIf="step === 'description'" class="input-box">
+      <textarea [(ngModel)]="userInput" 
+                placeholder="Paste job description here..."
+                (keydown.enter)="sendMessage(); $event.preventDefault()"
+                rows="3"></textarea>
+      <button (click)="sendMessage()" 
+              [disabled]="!userInput.trim()"
+              class="btn-send">
+        Send →
+      </button>
+    </div>
+
+    <!-- Analyzing (Step 3) -->
+    <div *ngIf="step === 'analyzing'" class="analyzing">
+      <div class="spinner"></div>
+      <span>AI is thinking...</span>
+      <button (click)="stopAnalysis()" class="btn-stop">⏹️ Stop</button>
+    </div>
+  </div>
+
+  <!-- History Sidebar -->
+  <div class="history-sidebar" [class.show]="showHistory">
+    <div class="sidebar-header">
+      <h3>📜 History</h3>
+      <button (click)="showHistory = false">✕</button>
+    </div>
+    
+    <div class="history-list">
+      <div *ngIf="history.length === 0" class="empty-history">
+        No history yet
+      </div>
+      
+      <div *ngFor="let item of history" 
+           class="history-item"
+           (click)="viewHistory(item)">
+        <div class="history-info">
+          <div class="history-name">{{ item.fileName }}</div>
+          <div class="history-date">{{ item.createdAt | date:'short' }}</div>
+        </div>
+        <div class="history-score" 
+             *ngIf="item.compatibilityScore"
+             [style.color]="item.compatibilityScore >= 70 ? '#28a745' : '#dc3545'">
+          {{ item.compatibilityScore }}%
+        </div>
+        <button (click)="deleteHistory(item.id, $event)" 
+                class="btn-delete-history">
+          🗑️
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

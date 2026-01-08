@@ -1,7 +1,9 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 export interface LoginRequest {
   username: string;
@@ -23,13 +25,15 @@ export interface RegisterRequest {
   providedIn: 'root'
 })
 export class Auth {
+  [x: string]: any;
   private apiUrl = 'https://localhost:7191/api'; // Update with your API URL
   private tokenKey = 'auth_token';
   private usernameKey = 'username';
   private isBrowser: boolean;
-
+  private isSessionAlertOpen = false;
   private isAuthenticatedSubject: BehaviorSubject<boolean>;
   public isAuthenticated$: Observable<boolean>;
+  private router: Router;
 
   constructor(
     private http: HttpClient,
@@ -38,6 +42,8 @@ export class Auth {
     this.isBrowser = isPlatformBrowser(platformId);
     this.isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
     this.isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+    this.router = inject(Router);
+
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -87,7 +93,7 @@ export class Auth {
 
   // Safe localStorage access methods
   private getItem(key: string): string | null {
-    if (this.isBrowser) {      
+    if (this.isBrowser) {
       return localStorage.getItem(key);
     }
     return null;
@@ -112,7 +118,7 @@ export class Auth {
       const payload = token.split('.')[1];
       // Decode base64
       const decodedPayload = JSON.parse(atob(payload));
-      
+
       return decodedPayload;
     } catch (error) {
       console.error('Error decoding token:', error);
@@ -124,6 +130,30 @@ export class Auth {
     const decoded = this.decodeToken(key);
 
     return decoded && decoded.role === 'Admin';
+  }
+  handleSessionExpired(): void {
+  if (this.isSessionAlertOpen) return;
+  this.isSessionAlertOpen = true;
+
+  Swal.fire({
+    title: 'Session Expired',
+    text: 'Your security token is no longer valid.',
+    icon: 'warning',
+    showCancelButton: false,
+    confirmButtonColor: '#3085d6',
+    confirmButtonText: 'Accept & Login', // This is your button
+    allowOutsideClick: false, // Force them to click the button
+    allowEscapeKey: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.executeLogoutRoutine();
+    }
+  });
+}
+  private executeLogoutRoutine(): void {
+    this.logout(); // Clears tokens and updates BehaviorSubject
+    this.isSessionAlertOpen = false;
+    this.router.navigate(['/login']);
   }
   // Get user role
   getUserRole(key: string): string | null {

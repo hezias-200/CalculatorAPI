@@ -21,7 +21,7 @@ export interface User {
 export class UserManagement implements OnInit {
   users: User[] = [];
   error: string = '';
-  
+
   private apiUrl = 'https://localhost:7191/api/Auth';
 
   constructor(
@@ -29,11 +29,12 @@ export class UserManagement implements OnInit {
     private authService: Auth,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+        this.authService.isLoggedIn() != true ? this.router.navigate(['/login']) : null;
+
     const isAdmin = this.authService.isAdmin(this.authService.getToken() || '');
-    
     if (!isAdmin) {
       this.error = 'Access denied';
       return;

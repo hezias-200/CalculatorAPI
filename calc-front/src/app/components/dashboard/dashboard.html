@@ -7,6 +7,8 @@
         <!-- Always visible buttons -->
         <button class="btn btn-primary">My Profile</button>
         <button class="btn btn-primary">Settings</button>
+        <button class="btn btn-primary">Settings</button>
+        <button class="btn btn-primary"  (click)="goToResumeAnalyzer()">🤖 AI Resume Analyzer</button>
 
         <!-- Only visible if user is Admin -->
         <button *ngIf="isAdmin" class="btn btn-admin" (click)="goToUserManagement()">

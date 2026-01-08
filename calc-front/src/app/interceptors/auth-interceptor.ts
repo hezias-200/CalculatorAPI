@@ -16,10 +16,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
+
   // ✅ Add error handling and logging
   return next(req).pipe(
     catchError((error) => {
-      console.error('❌ HTTP Error:', error);
+      if (error.status === 401) {
+        authService.handleSessionExpired();// This will alert and redirect
+      }
       return throwError(() => error);
     })
   );

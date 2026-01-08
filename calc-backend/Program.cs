@@ -48,6 +48,7 @@ namespace CalculatorAPI
                                .AllowAnyMethod();
                     }
                 });
+
             });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
                 {
@@ -101,7 +102,10 @@ namespace CalculatorAPI
             builder.Services.AddDbContext<ApplicationDbContext>(options =>options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICalculatorService, CalculatorService>();
-
+            builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
+            builder.Services.AddScoped<IPdfService, PdfService>();
+            builder.Services.AddScoped<IGeminiService, GeminiService>();
+            builder.Services.AddHttpClient<GeminiService>();  // For HTTP requests to Gemini API
             var app = builder.Build();
 
             // Configure middleware
