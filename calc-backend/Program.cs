@@ -97,6 +97,8 @@ namespace CalculatorAPI
                         Array.Empty<string>()
                     }
                 });
+                c.OperationFilter<FileUploadOperationFilter>();
+
             });
             builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters().AddValidatorsFromAssemblyContaining<RegisterModelValidator>();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 namespace CalculatorAPI.Services
@@ -6,7 +6,6 @@ namespace CalculatorAPI.Services
     public interface IGeminiService
     {
         Task<string> AnalyzeResumeAsync(string resumeText, string jobDescription);
-
     }
 
     public class GeminiService : IGeminiService
@@ -24,7 +23,7 @@ namespace CalculatorAPI.Services
         public async Task<string> AnalyzeResumeAsync(string resumeText, string jobDescription)
         {
             var prompt = $@"
-You are an expert resume analyzer. Analyze the following resume against the job description and provide a detailed analysis.
+You are a resume analyzer. Analyze the resume against the job description.
 
 RESUME:
 {resumeText}
@@ -32,13 +31,17 @@ RESUME:
 JOB DESCRIPTION:
 {jobDescription}
 
-Provide your analysis in the following JSON format (respond ONLY with valid JSON, no other text):
+CRITICAL: You MUST respond with ONLY valid JSON. Do NOT use markdown, do NOT add backticks, do NOT add any text before or after the JSON.
+
+Return this exact JSON structure:
 {{
-    ""compatibilityScore"": <number 0-100>,
-    ""matchedSkills"": [""skill1"", ""skill2"", ...],
-    ""missingSkills"": [""skill1"", ""skill2"", ...],
-    ""suggestions"": ""Detailed suggestions for improvement""
-}}";
+    ""compatibilityScore"": 75,
+    ""matchedSkills"": [""skill1"", ""skill2""],
+    ""missingSkills"": [""skill3"", ""skill4""],
+    ""suggestions"": ""Your detailed suggestions here""
+}}
+
+Return ONLY the JSON object, nothing else.";
 
             var requestBody = new
             {
@@ -56,12 +59,12 @@ Provide your analysis in the following JSON format (respond ONLY with valid JSON
 
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var url = $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}";
 
             var response = await _httpClient.PostAsync(
-             $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}",
+                $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}",
                 content
             );
+
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
@@ -69,12 +72,7 @@ Provide your analysis in the following JSON format (respond ONLY with valid JSON
             }
 
             var responseJson = await response.Content.ReadAsStringAsync();
-
-
             var geminiResponse = JsonDocument.Parse(responseJson);
-
-            Console.WriteLine(geminiResponse);
-
 
             var text = geminiResponse.RootElement
                 .GetProperty("candidates")[0]
@@ -83,7 +81,32 @@ Provide your analysis in the following JSON format (respond ONLY with valid JSON
                 .GetProperty("text")
                 .GetString();
 
-            return text ?? throw new Exception("Empty response from Gemini");
+            if (string.IsNullOrEmpty(text))
+                throw new Exception("Empty response from Gemini");
+
+            Console.WriteLine($"Raw Gemini response: {text}");
+
+            // ✅ Aggressively clean the response
+            text = text.Trim();
+
+            // Remove markdown code blocks
+            if (text.Contains("```"))
+            {
+                // Extract JSON between backticks
+                var startIndex = text.IndexOf('{');
+                var endIndex = text.LastIndexOf('}');
+
+                if (startIndex >= 0 && endIndex > startIndex)
+                {
+                    text = text.Substring(startIndex, endIndex - startIndex + 1);
+                }
+            }
+
+            text = text.Trim();
+
+            Console.WriteLine($"Cleaned JSON: {text}");
+
+            return text;
         }
     }
 }

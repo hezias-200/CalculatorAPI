@@ -35,7 +35,7 @@ namespace CalculatorAPI.Controllers
 
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadResume(IFormFile? file, string? jobDescription)
+        public async Task<IActionResult> UploadResume([FromForm(Name = "file")] IFormFile? file, [FromForm(Name = "jobDescription")] string? jobDescription)
         {
             try
             {
