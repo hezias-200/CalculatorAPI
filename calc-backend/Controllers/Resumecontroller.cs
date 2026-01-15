@@ -35,6 +35,7 @@ namespace CalculatorAPI.Controllers
 
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]  // ✅ Hide from Swagger
         public async Task<IActionResult> UploadResume([FromForm(Name = "file")] IFormFile? file, [FromForm(Name = "jobDescription")] string? jobDescription)
         {
             try

@@ -98,6 +98,8 @@ namespace CalculatorAPI
                     }
                 });
                 c.OperationFilter<FileUploadOperationFilter>();
+                c.MapType<IFormFile>(() => new OpenApiSchema { Type = "string", Format = "binary" });
+
 
             });
             builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters().AddValidatorsFromAssemblyContaining<RegisterModelValidator>();
