@@ -1,15 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { Auth } from '../../services/auth';
+import { Auth } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-
-export interface User {
-  id: number;
-  username: string;
-  role: string;
-  isActive: boolean;
-}
+import { UserService } from '../../services/usermanagment.service';
+import { User } from '../../interfaces/user';
 
 @Component({
   selector: 'app-user-management',
@@ -22,17 +16,15 @@ export class UserManagement implements OnInit {
   users: User[] = [];
   error: string = '';
 
-  private apiUrl = 'https://localhost:7191/api/Auth';
-
   constructor(
-    private http: HttpClient,
     private authService: Auth,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-        this.authService.isLoggedIn() != true ? this.router.navigate(['/login']) : null;
+    this.authService.isLoggedIn() != true ? this.router.navigate(['/login']) : null;
 
     const isAdmin = this.authService.isAdmin(this.authService.getToken() || '');
     if (!isAdmin) {
@@ -44,7 +36,7 @@ export class UserManagement implements OnInit {
   }
 
   loadUsers(): void {
-    this.http.get<User[]>(`${this.apiUrl}/users`).subscribe(
+    this.userService.getUsers().subscribe(
       (response) => {
         this.users = [...response];
         this.cdr.markForCheck();
@@ -55,7 +47,7 @@ export class UserManagement implements OnInit {
 
   deleteUser(username: string): void {
     if (!confirm(`Delete ${username}?`)) return;
-    this.http.delete(`${this.apiUrl}/users/${username}`).subscribe(
+    this.userService.deleteUser(username).subscribe(
       () => this.loadUsers()
     );
   }

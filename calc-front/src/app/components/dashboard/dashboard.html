@@ -1,21 +1,208 @@
-<div class="dashboard-container">
-  <div class="dashboard-header">
-      <h1>Dashboard</h1>
-      <p>Welcome, {{ username }}!</p>
-      <p>Your role: <span class="role-badge">{{ userRole }}</span></p>
-      <div class="actions">
-        <!-- Always visible buttons -->
-        <button class="btn btn-primary">My Profile</button>
-        <button class="btn btn-primary">Settings</button>
-        <button class="btn btn-primary">Settings</button>
-        <button class="btn btn-primary"  (click)="goToResumeAnalyzer()">🤖 AI Resume Analyzer</button>
+<div class="modern-dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1 class="greeting">Welcome back, {{ username }}! 👋</h1>
+        <p class="subtitle">Here's what's happening with your applications today</p>
+      </div>
+      <div class="header-actions">
+        <span class="role-badge" [class.admin]="isAdmin">{{ userRole }}</span>
+        <button class="btn-icon" title="Notifications">
+          <span class="notification-dot"></span>
+          🔔
+        </button>
+        <button class="btn-logout" (click)="logout()">
+          <span>Logout</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 14H3.33333C2.59695 14 2 13.403 2 12.6667V3.33333C2 2.59695 2.59695 2 3.33333 2H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M11.3333 11.3333L14 8M14 8L11.3333 4.66667M14 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
 
-        <!-- Only visible if user is Admin -->
-        <button *ngIf="isAdmin" class="btn btn-admin" (click)="goToUserManagement()">
-          👥 User Management
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        📄
+      </div>
+      <div class="stat-content">
+        <h3>Total Resumes</h3>
+        <p class="stat-number">24</p>
+        <span class="stat-change positive">+12% this month</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        ✅
+      </div>
+      <div class="stat-content">
+        <h3>Analyzed</h3>
+        <p class="stat-number">18</p>
+        <span class="stat-change positive">+8% this week</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        ⏳
+      </div>
+      <div class="stat-content">
+        <h3>In Progress</h3>
+        <p class="stat-number">3</p>
+        <span class="stat-change neutral">Processing now</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+        📊
+      </div>
+      <div class="stat-content">
+        <h3>Avg. Match</h3>
+        <p class="stat-number">72%</p>
+        <span class="stat-change positive">+5% from last</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Quick Actions -->
+    <div class="card quick-actions-card">
+      <h2 class="card-title">Quick Actions</h2>
+      <div class="actions-grid">
+        <button class="action-btn" (click)="goToResumeAnalyzer()">
+          <div class="action-icon">🤖</div>
+          <div class="action-content">
+            <h3>Analyze Resume</h3>
+            <p>Upload and analyze a new resume</p>
+          </div>
+          <span class="action-arrow">→</span>
         </button>
 
-        <button class="btn btn-secondary" (click)="logout()">Logout</button>
+        <button class="action-btn">
+          <div class="action-icon">📂</div>
+          <div class="action-content">
+            <h3>My Resumes</h3>
+            <p>View all analyzed resumes</p>
+          </div>
+          <span class="action-arrow">→</span>
+        </button>
+
+        <button class="action-btn">
+          <div class="action-icon">⚙️</div>
+          <div class="action-content">
+            <h3>Settings</h3>
+            <p>Manage your preferences</p>
+          </div>
+          <span class="action-arrow">→</span>
+        </button>
+
+        <button *ngIf="isAdmin" class="action-btn admin-action" (click)="goToUserManagement()">
+          <div class="action-icon">👥</div>
+          <div class="action-content">
+            <h3>User Management</h3>
+            <p>Manage system users</p>
+          </div>
+          <span class="action-arrow">→</span>
+        </button>
       </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card recent-activity-card">
+      <h2 class="card-title">Recent Activity</h2>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon success">✓</div>
+          <div class="activity-content">
+            <h4>Resume Analyzed</h4>
+            <p>John_Doe_Resume.pdf - 85% match</p>
+            <span class="activity-time">2 hours ago</span>
+          </div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-icon processing">⏳</div>
+          <div class="activity-content">
+            <h4>Analysis in Progress</h4>
+            <p>Jane_Smith_CV.pdf</p>
+            <span class="activity-time">5 hours ago</span>
+          </div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-icon success">✓</div>
+          <div class="activity-content">
+            <h4>Resume Analyzed</h4>
+            <p>Mike_Johnson_Resume.pdf - 92% match</p>
+            <span class="activity-time">1 day ago</span>
+          </div>
+        </div>
+
+        <div class="activity-item">
+          <div class="activity-icon warning">!</div>
+          <div class="activity-content">
+            <h4>Low Match Score</h4>
+            <p>Sarah_Williams_CV.pdf - 45% match</p>
+            <span class="activity-time">2 days ago</span>
+          </div>
+        </div>
+      </div>
+      <button class="view-all-btn">View All Activity →</button>
+    </div>
+  </div>
+
+  <!-- Admin Panel - Only for Admins -->
+  <div *ngIf="isAdmin" class="admin-panel">
+    <h2 class="section-title">
+      <span class="title-icon">🛡️</span>
+      Admin Dashboard
+    </h2>
+    <div class="admin-grid">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>System Status</h3>
+          <span class="status-indicator online">●</span>
+        </div>
+        <div class="admin-stats">
+          <div class="admin-stat">
+            <span class="label">Total Users</span>
+            <span class="value">156</span>
+          </div>
+          <div class="admin-stat">
+            <span class="label">Active Today</span>
+            <span class="value">42</span>
+          </div>
+          <div class="admin-stat">
+            <span class="label">Server Load</span>
+            <span class="value">23%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Quick Admin Actions</h3>
+        <div class="admin-actions">
+          <button class="admin-action-btn" (click)="goToUserManagement()">
+            <span>👥</span> Manage Users
+          </button>
+          <button class="admin-action-btn">
+            <span>📊</span> View Reports
+          </button>
+          <button class="admin-action-btn">
+            <span>🔧</span> System Config
+          </button>
+          <button class="admin-action-btn">
+            <span>📝</span> View Logs
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

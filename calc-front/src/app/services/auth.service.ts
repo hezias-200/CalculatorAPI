@@ -4,22 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { LoginRequest } from '../interfaces/loginRequest';
+import { LoginResponse } from '../interfaces/loginResponse';
+import { RegisterRequest } from '../interfaces/registerRequest';
 
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
 
-export interface LoginResponse {
-  token: string;
-  username: string;
-}
 
-export interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-}
 
 @Injectable({
   providedIn: 'root'
