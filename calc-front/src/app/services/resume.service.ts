@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { log } from 'console';
-
+import { Router } from '@angular/router';
 export interface ResumeAnalysis {
   id: number;
   fileName: string;
@@ -29,7 +28,7 @@ export class ResumeService {
   private apiUrl = 'https://localhost:7191/api/Resume';
   private cachedResumeHistory: ResumeAnalysis[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   uploadResume(file: File, jobDescription: string): Observable<UploadResponse> {
     const formData = new FormData();
@@ -61,20 +60,26 @@ export class ResumeService {
   }
 
   getPassedAnalyses(): number {
-    return this.cachedResumeHistory.filter(resume => resume.status === 'Completed').length+1;
+    return this.cachedResumeHistory.filter(resume => resume.status === 'Completed').length + 1;
   }
   getProcessingAnalyses(): number {
     return this.cachedResumeHistory.filter(resume => resume.status === 'Processing').length;
   }
   getAvgAnalyses(): string {
-    return ((this.getPassedAnalyses() / this.getTotalAnalyses() )* 100).toFixed(2);
+    return ((this.getPassedAnalyses() / this.getTotalAnalyses()) * 100).toFixed(2);
 
   }
   getTotalAnalyses(): number {
-    return this.cachedResumeHistory.length+1;
+    return this.cachedResumeHistory.length + 1;
   }
 
   deleteAnalysis(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+  goToResumeAnalyzer(): void {
+    this.router.navigate(['/resume-analyzer']);
+  }
+  goToViewReports(): void {
+    this.router.navigate(['/view-reports']);
   }
 }
