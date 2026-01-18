@@ -1,0 +1,132 @@
+<div class="reports-container">
+  <!-- Header -->
+  <header class="reports-header">
+    <button class="btn-back" (click)="goBack()">← Back to Dashboard</button>
+    <h1>📊 Reports & Analytics</h1>
+    <p class="subtitle">Comprehensive resume analysis reports</p>
+  </header>
+
+  <!-- Stats Overview -->
+  <div class="stats-overview">
+    <div class="stat-box">
+      <div class="stat-icon">📄</div>
+      <div class="stat-info">
+        <h3>Total Analyses</h3>
+        <p class="stat-value">{{ totalAnalyses }}</p>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>Passed (>70%)</h3>
+        <p class="stat-value">{{ passedAnalyses }}</p>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-info">
+        <h3>Below Threshold</h3>
+        <p class="stat-value">{{ belowThreshold }}</p>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-icon">📈</div>
+      <div class="stat-info">
+        <h3>Avg Score</h3>
+        <p class="stat-value">{{ averageScore }}%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <h2>Filters</h2>
+    <div class="filters-grid">
+      <select [(ngModel)]="filterStatus" (change)="applyFilters()" class="filter-select">
+        <option value="">All Statuses</option>
+        <option value="Completed">Completed</option>
+        <option value="Processing">Processing</option>
+        <option value="Failed">Failed</option>
+      </select>
+
+      <select [(ngModel)]="filterScore" (change)="applyFilters()" class="filter-select">
+        <option value="">All Scores</option>
+        <option value="high">High (80%+)</option>
+        <option value="medium">Medium (60-79%)</option>
+        <option value="low">Low (<60%)</option>
+      </select>
+
+      <input type="date" [(ngModel)]="filterDateFrom" (change)="applyFilters()" class="filter-input" placeholder="From Date">
+      <input type="date" [(ngModel)]="filterDateTo" (change)="applyFilters()" class="filter-input" placeholder="To Date">
+    </div>
+  </div>
+
+  <!-- Reports Table -->
+  <div class="reports-table-container">
+    <table class="reports-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>File Name</th>
+          <th>Status</th>
+          <th>Score</th>
+          <th>Matched Skills</th>
+          <th>Missing Skills</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let report of filteredReports">
+          <td>#{{ report.id }}</td>
+          <td>{{ report.fileName }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'badge-success': report.status === 'Completed',
+              'badge-warning': report.status === 'Processing',
+              'badge-danger': report.status === 'Failed'
+            }">
+              {{ report.status }}
+            </span>
+          </td>
+          <td>
+            <span class="score" [style.color]="getScoreColor(report.compatibilityScore)">
+              {{ report.compatibilityScore || 'N/A' }}%
+            </span>
+          </td>
+          <td>{{ report.matchedSkills?.length || 0 }}</td>
+          <td>{{ report.missingSkills?.length || 0 }}</td>
+          <td>{{ report.createdAt | date:'short' }}</td>
+          <td>
+            <button (click)="viewDetails(report.id)" class="btn-action btn-view">👁️</button>
+            <button (click)="downloadReport(report.id)" class="btn-action btn-download">⬇️</button>
+            <button (click)="deleteReport(report.id)" class="btn-action btn-delete">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredReports.length === 0" class="no-data">
+      <p>📭 No reports found matching your filters</p>
+    </div>
+  </div>
+
+  <!-- Export Options -->
+  <div class="export-section">
+    <h2>Export Reports</h2>
+    <div class="export-buttons">
+      <button (click)="exportToPDF()" class="btn-export">
+        📄 Export to PDF
+      </button>
+      <button (click)="exportToExcel()" class="btn-export">
+        📊 Export to Excel
+      </button>
+      <button (click)="exportToCSV()" class="btn-export">
+        📋 Export to CSV
+      </button>
+    </div>
+  </div>
+</div>
