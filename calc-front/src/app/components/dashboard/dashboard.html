@@ -85,29 +85,27 @@
           <span class="action-arrow">→</span>
         </button>
 
-        <button class="action-btn">
+        <button class="action-btn" (click)="goToViewReports()">
           <div class="action-icon">📂</div>
           <div class="action-content">
             <h3>My Resumes</h3>
             <p>View all analyzed resumes</p>
           </div>
           <span class="action-arrow">→</span>
-        </button>
-
-        <button class="action-btn">
-          <div class="action-icon">⚙️</div>
-          <div class="action-content">
-            <h3>Settings</h3>
-            <p>Manage your preferences</p>
-          </div>
-          <span class="action-arrow">→</span>
-        </button>
-
+        </button>        
         <button *ngIf="isAdmin" class="action-btn admin-action" (click)="goToUserManagement()">
           <div class="action-icon">👥</div>
           <div class="action-content">
             <h3>User Management</h3>
             <p>Manage system users</p>
+          </div>
+          <span class="action-arrow">→</span>
+        </button>
+           <button class="action-btn">
+          <div class="action-icon">⚙️</div>
+          <div class="action-content">
+            <h3>Settings</h3>
+            <p>Manage your preferences</p>
           </div>
           <span class="action-arrow">→</span>
         </button>
@@ -119,14 +117,13 @@
       <h2 class="card-title">Recent Activity</h2>
       <div class="activity-list">
         <div class="activity-item" *ngFor="let resume of resumes.slice(0,4); let i = index">
-          <div class="activity-icon" 
-               [ngClass]="{
-                 'success': resume.status?.toLowerCase() === 'completed',
-                 'processing': resume.status?.toLowerCase() === 'processing',
-                 'warning': resume.status?.toLowerCase() === 'failed'
+          <div class="activity-icon"              [ngClass]="{
+                 'success': resume.status.toLowerCase() === 'completed',
+                 'processing': resume.status.toLowerCase() === 'processing',
+                 'warning': resume.status.toLowerCase() === 'failed'
                }">
-            {{ resume.status?.toLowerCase() === 'completed' ? '✓' : 
-               resume.status?.toLowerCase() === 'processing' ? '⏳' : '!' }}
+            {{ resume.status.toLowerCase() === 'completed' ? '✓' : 
+               resume.status.toLowerCase() === 'processing' ? '⏳' : '!' }}
           </div>
           <div class="activity-content">
             <h4>{{ resume.status === 'Completed' ? 'Resume Analyzed' : 'Analysis ' + resume.status }}</h4>
@@ -173,7 +170,7 @@
           <button class="admin-action-btn" (click)="goToUserManagement()">
             <span>👥</span> Manage Users
           </button>
-          <button class="admin-action-btn">
+          <button class="admin-action-btn" (click)="goToViewReports()">
             <span>📊</span> View Reports
           </button>
           <button class="admin-action-btn">

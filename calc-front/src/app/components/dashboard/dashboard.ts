@@ -18,7 +18,7 @@ export class Dashboard implements OnInit {
   totalPassed: number = 0;
   totalAnalyses: number = 0;
   inProcess: number = 0;
-  avgScore: string ='';
+  avgScore: string = '';
 
   totalUsers = signal(0);
   activeUsers = signal(0);
@@ -63,7 +63,7 @@ export class Dashboard implements OnInit {
         this.totalAnalyses = this.resumesService.getTotalAnalyses();
         this.inProcess = this.resumesService.getProcessingAnalyses();
         this.avgScore = this.resumesService.getAvgAnalyses();
-        
+
       }
     });
 
@@ -73,9 +73,13 @@ export class Dashboard implements OnInit {
     this.router.navigate(['/login']);
   }
   goToUserManagement(): void {
-    this.router.navigate(['/user-management']);
+    this.userService.goToUserManagement();
   }
   goToResumeAnalyzer(): void {
-    this.router.navigate(['/resume-analyzer']);
+    this.resumesService.goToResumeAnalyzer();
   }
+  goToViewReports(): void {
+    this.resumesService.goToViewReports();
+  }
+
 }
