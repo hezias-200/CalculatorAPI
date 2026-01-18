@@ -13,7 +13,7 @@ export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
-  { path: 'user-management', component: UserManagement, canActivate: [authGuard] },
+  { path: 'user-management', component: UserManagement},
   { path: 'view-reports', component: ViewReports},
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
   { path: 'resume-analyzer', component: ResumeAnalyzer },
