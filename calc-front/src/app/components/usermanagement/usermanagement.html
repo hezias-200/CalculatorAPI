@@ -1,73 +1,197 @@
-<div class="user-management-container">
-  <div class="header">
-    <button class="btn-back" (click)="goBack()">← Back to Dashboard</button>
-    <h1>👥 User Management</h1>
-    <p class="subtitle">Manage all system users</p>
+<div class="user-management-wrapper">
+  <!-- Header -->
+  <header class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/>
+      </svg>
+      Back to Dashboard
+    </button>
+    <div class="header-content">
+      <h1>👥 User Management</h1>
+      <p class="subtitle">Manage system users and permissions</p>
+    </div>
+  </header>
+
+  <!-- Stats Overview -->
+  <div class="stats-section" *ngIf="!loading && hasUsers">
+    <div class="stat-card primary">
+      <div class="stat-icon">👥</div>
+      <div class="stat-details">
+        <h3>Total Users</h3>
+        <p class="stat-number">{{ users.length }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card success">
+      <div class="stat-icon">✅</div>
+      <div class="stat-details">
+        <h3>Active Users</h3>
+        <p class="stat-number">{{ activeUsersCount }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-details">
+        <h3>Inactive Users</h3>
+        <p class="stat-number">{{ users.length - activeUsersCount }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card info">
+      <div class="stat-icon">🛡️</div>
+      <div class="stat-details">
+        <h3>Administrators</h3>
+        <p class="stat-number">{{ adminUsersCount }}</p>
+      </div>
+    </div>
   </div>
 
-  <!-- Error -->
-  <div *ngIf="error" style="color: red; padding: 20px;">
-    {{ error }}
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-ring"></div>
+    <p>Loading users...</p>
   </div>
 
-  <!-- Table - NO loading check, just show if users exist -->
-  <div *ngIf="users.length > 0">
-    <h3 style="color: green; padding: 20px;">✅ Found {{ users.length }} users!</h3>
+  <!-- Error State -->
+  <div *ngIf="error" class="error-card">
+    <div class="error-icon">⚠️</div>
+    <h3>Error Loading Users</h3>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadUsers()">Try Again</button>
+  </div>
 
-    <table style="width: 100%; border-collapse: collapse; border: 2px solid #667eea;">
-      <thead>
-        <tr style="background: #667eea; color: white;">
-          <th style="padding: 15px; border: 1px solid white;">ID</th>
-          <th style="padding: 15px; border: 1px solid white;">Username</th>
-          <th style="padding: 15px; border: 1px solid white;">Role</th>
-          <th style="padding: 15px; border: 1px solid white;">Status</th>
-          <th style="padding: 15px; border: 1px solid white;">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users" style="border: 1px solid #ddd;">
-          <td style="padding: 10px; border: 1px solid #ddd;">{{ user.id }}</td>
-          <td style="padding: 10px; border: 1px solid #ddd;">👤 {{ user.username }}</td>
-          <td style="padding: 10px; border: 1px solid #ddd;">
-            <span [ngClass]="getRoleBadgeClass(user.role)"
-              style="padding: 4px 8px; border-radius: 4px; background: #f0f0f0;">
-              {{ user.role }}
-            </span>
-          </td>
-          <td style="padding: 10px; border: 1px solid #ddd;">
-            <span [ngClass]="getStatusBadgeClass(user.isActive)" style="padding: 4px 8px; border-radius: 4px;"
-              [style.background]="user.isActive ? '#d4edda' : '#f8d7da'"
-              [style.color]="user.isActive ? '#155724' : '#721c24'">
-              {{ user.isActive ? 'Active' : 'Inactive' }}
-            </span>
-          </td>
-          <td style="padding: 10px; border: 1px solid #ddd;">
-            <button *ngIf="user.isActive" (click)="deleteUser(user.username)"
-              style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
-              🗑️ Delete
-            </button>
-            <span *ngIf="!user.isActive" style="color: #999;">
-              —
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Users Table -->
+  <div *ngIf="!loading && hasUsers" class="users-section">
+    <div class="section-header">
+      <h2>All Users ({{ users.length }})</h2>
+      <div class="section-actions">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg>
+          <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" placeholder="Search users...">
+        </div>
+        <button class="btn-add">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 3v10M3 8h10"/>
+          </svg>
+          Add User
+        </button>
+      </div>
+    </div>
 
-    <!-- Stats -->
-    <div style="margin-top: 30px; padding: 20px; background: #f5f7fa; border-radius: 8px;">
-      <h4>Statistics:</h4>
-      <p><strong>Total Users:</strong> {{ users.length }}</p>
-      <p><strong>Active Users:</strong> {{ activeUsersCount }}</p>
-      <p><strong>Admins:</strong> {{ adminUsersCount }}</p>
+    <div class="table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" class="checkbox">
+            </th>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers" [class.inactive-row]="!user.isActive">
+            <td>
+              <input type="checkbox" class="checkbox">
+            </td>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar-small" [style.background]="getAvatarColor(user.role)">
+                  {{ user.username.charAt(0).toUpperCase() }}
+                </div>
+                <div class="user-details">
+                  <span class="user-name">{{ user.username }}</span>
+                  <span class="user-email">user@example.com</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="role-badge" [ngClass]="getRoleBadgeClass(user.role)">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>
+              <div class="status-cell">
+                <span class="status-dot" [class.active]="user.isActive"></span>
+                <span [class.active-text]="user.isActive" [class.inactive-text]="!user.isActive">
+                  {{ user.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="user-id">#{{ user.id }}</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon" title="Edit">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/>
+                  </svg>
+                </button>
+                <button 
+                  class="btn-icon btn-delete-icon" 
+                  (click)="deleteUser(user.username)"
+                  [disabled]="!user.isActive"
+                  title="Delete">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                  </svg>
+                </button>
+                <button class="btn-icon" title="More">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button class="btn-page" [disabled]="currentPage === 1" (click)="previousPage()">
+          Previous
+        </button>
+        <div class="page-numbers">
+          <button 
+            *ngFor="let page of getPageNumbers()" 
+            class="btn-page-number"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        </div>
+        <button class="btn-page" [disabled]="currentPage === totalPages" (click)="nextPage()">
+          Next
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="users.length === 0 && !error" style="text-align: center; padding: 60px;">
-    <div style="font-size: 64px;">📭</div>
+  <div *ngIf="!loading && !hasUsers" class="empty-state">
+    <div class="empty-illustration">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="50" fill="#f1f5f9"/>
+        <path d="M60 30c-8.28 0-15 6.72-15 15s6.72 15 15 15 15-6.72 15-15-6.72-15-15-15zm0 40c-13.33 0-40 6.67-40 20v10h80V90c0-13.33-26.67-20-40-20z" fill="#cbd5e1"/>
+      </svg>
+    </div>
     <h3>No Users Found</h3>
-    <p>Waiting for data...</p>
-    <p style="color: #999;">users.length = {{ users.length }}</p>
+    <p>There are no users in the system yet. Add your first user to get started.</p>
+    <button class="btn-primary">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 3v10M3 8h10"/>
+      </svg>
+      Add First User
+    </button>
   </div>
 </div>

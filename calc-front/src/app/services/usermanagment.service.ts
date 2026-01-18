@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { User } from '../interfaces/user';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class UserService {
   private apiUrl = 'https://localhost:7191/api/Auth';
   private cachedUsers: User[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   // Get all users
   getUsers(): Observable<User[]> {
@@ -36,5 +37,8 @@ export class UserService {
 
   getTotalUsersCount(): number {
     return this.cachedUsers.length;
+  }
+    goToUserManagement(): void {
+    this.router.navigate(['/user-management']);
   }
 }
