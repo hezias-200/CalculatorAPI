@@ -27,10 +27,10 @@ namespace CalculatorAPI.Repositories
             return  _context.SaveChanges() > 0;
         }
 
-        public async Task<bool> IsUsernameUniqueAsync(string username)
+        public async Task<bool> IsEmailUniqueAsync(string email)
 
         {
-            return !await _context.Users.AnyAsync(u => u.Username == username);
+            return !await _context.Users.AnyAsync(u => u.Email == email);
         }
 
         public async Task<UserModel?> GetByUsernameAsync(string username)

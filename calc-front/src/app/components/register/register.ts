@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { RegisterRequest  } from '../../interfaces/registerRequest';
-import { Auth  } from '../../services/auth.service';
+import { RegisterRequest } from '../../interfaces/registerRequest';
+import { Auth } from '../../services/auth.service';
 
 
 @Component({
@@ -14,21 +14,25 @@ import { Auth  } from '../../services/auth.service';
   styleUrls: ['./register.css']
 })
 export class Register implements OnInit {
+  @Input() isModal: boolean = false;
+  @Input() hideTerms: boolean = false;
+  @Output() onRegisterSuccess = new EventEmitter<void>();
+  @Output() onCancel = new EventEmitter<void>();
+
   registerForm!: FormGroup;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   passwordStrength: 'weak' | 'medium' | 'strong' | '' = '';
-
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Redirect if already logged in
-    if (this.authService.isLoggedIn()) {
+    if (!this.isModal && this.authService.isLoggedIn()) {
       this.router.navigate(['/dashboard']);
     }
 
@@ -38,19 +42,15 @@ export class Register implements OnInit {
         Validators.minLength(3),
         Validators.pattern(/^[a-zA-Z0-9_]+$/)
       ]],
-      email: ['', [
-        Validators.required,
-        Validators.email
-      ]],
+      role: ['User', [Validators.required]],
+      acceptTerms: [false, this.hideTerms ? [] : [Validators.requiredTrue]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
         Validators.minLength(6)
       ]],
       confirmPassword: ['', [
         Validators.required
-      ]],
-      acceptTerms: [false, [
-        Validators.requiredTrue
       ]]
     }, {
       validators: this.passwordMatchValidator
@@ -103,6 +103,9 @@ export class Register implements OnInit {
   get username() {
     return this.registerForm.get('username');
   }
+  get role() {
+    return this.registerForm.get('role');
+  }
 
   get email() {
     return this.registerForm.get('email');
@@ -128,26 +131,33 @@ export class Register implements OnInit {
 
       const userData: RegisterRequest = {
         username: this.registerForm.value.username,
-        email: this.registerForm.value.email,
-        password: this.registerForm.value.password
+        email: this.registerForm.value.email || '',
+        password: this.registerForm.value.password,
+        role: this.registerForm.value.role || 'User'
       };
 
       this.authService.register(userData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.successMessage = 'Registration successful! Redirecting to login...';
-          
-          // Reset form
-          this.registerForm.reset();
-          
-          // Redirect to login after 2 seconds
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
+
+          if (this.isModal) {
+            // ✅ Modal mode - emit success and let parent handle
+            this.successMessage = 'User added successfully!';
+            setTimeout(() => {
+              this.onRegisterSuccess.emit();
+            }, 1000);
+          } else {
+            // ✅ Page mode - redirect to login
+            this.successMessage = 'Registration successful! Redirecting to login...';
+            this.registerForm.reset();
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 2000);
+          }
         },
         error: (error) => {
           this.isLoading = false;
-          
+
           // Handle different error scenarios
           if (error.status === 400) {
             this.errorMessage = error.error?.message || 'Invalid registration data';
@@ -156,7 +166,7 @@ export class Register implements OnInit {
           } else {
             this.errorMessage = 'Registration failed. Please try again.';
           }
-          
+
           console.error('Registration error:', error);
         }
       });
@@ -166,5 +176,8 @@ export class Register implements OnInit {
         this.registerForm.get(key)?.markAsTouched();
       });
     }
+  }
+  cancel(): void {
+    this.onCancel.emit();
   }
 }

@@ -6,7 +6,31 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 40px 20px;
 }
+.register-container.modal-mode {
+  background: transparent;
+  min-height: auto;
+  padding: 0;
+}
+.modal-overlay-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
 
+.modal-content-wrapper {
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
 .register-card {
   background: white;
   border-radius: 12px;
@@ -67,6 +91,7 @@
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
+
 
 .form-control:focus {
   outline: none;
@@ -239,9 +264,15 @@
     padding: 20px;
   }
 
-  .register-card {
-    padding: 30px 20px;
-  }
+.register-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 600px;  /* ✅ Changed from 480px to 600px */
+  animation: slideIn 0.5s ease-out;
+}
 
   .register-header h1 {
     font-size: 24px;

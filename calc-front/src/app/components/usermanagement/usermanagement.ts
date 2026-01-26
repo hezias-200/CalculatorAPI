@@ -4,14 +4,16 @@ import { Auth } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/usermanagment.service';
 import { User } from '../../interfaces/user';
-import { FormsModule } from '@angular/forms';  
+import { FormsModule } from '@angular/forms';
+import { RegisterRequest } from '../../interfaces/registerRequest';
+import { Register } from '../register/register';
 
 @Component({
   selector: 'app-user-management',
-  imports: [CommonModule, FormsModule],  
+  imports: [CommonModule, FormsModule, Register],
   standalone: true,
   templateUrl: './usermanagement.html',
-  styleUrl: './usermanagement.css',
+  styleUrls: ['./usermanagement.css', '../register/register.css']
 })
 export class UserManagement implements OnInit {
   users: User[] = [];
@@ -23,6 +25,16 @@ export class UserManagement implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 10;
   totalPages: number = 1;
+  showAddUserModal: boolean = false;
+  addingUser: boolean = false;
+  addUserError: string = '';
+
+  newUser: RegisterRequest = {
+    username: '',
+    email: '',
+    password: ''
+  };
+
   constructor(
     private authService: Auth,
     private userService: UserService,
@@ -75,6 +87,14 @@ export class UserManagement implements OnInit {
     this.filteredUsers = filtered.slice(startIndex, endIndex);
 
   }
+  onUserAdded(): void {
+    this.closeAddUserModal();
+    this.loadUsers(); // Refresh user list
+    alert('✅ User added successfully!');
+  }
+  openAddUserModal(): void {
+    this.showAddUserModal = true;
+  }
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
@@ -118,7 +138,7 @@ export class UserManagement implements OnInit {
   }
 
   get adminUsersCount(): number {
-    return this.users.filter(u => u.role === 'Admin').length;
+    return this.users.filter(u => u.role.toLocaleLowerCase() === 'admin').length;
   }
 
   getRoleBadgeClass(role: string): string {
@@ -140,6 +160,53 @@ export class UserManagement implements OnInit {
       case 'user': return 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
       default: return 'linear-gradient(135deg, #64748b 0%, #475569 100%)';
     }
+  }
+  showAddUserModalPopup(): void {
+    this.showAddUserModal = true;
+    this.newUser = {
+      username: '',
+      email: '',
+      password: ''
+    };
+    this.addUserError = '';
+  }
+
+  closeAddUserModal(): void {
+    this.showAddUserModal = false;
+    this.addUserError = '';
+    this.newUser = {
+      username: '',
+      password: '',
+      email: ''
+    };
+  }
+  addUser(): void {
+    if (!this.newUser.username || !this.newUser.password) {
+      this.addUserError = 'Username and password are required';
+      return;
+    }
+
+    if (this.newUser.password.length < 6) {
+      this.addUserError = 'Password must be at least 6 characters';
+      return;
+    }
+
+    this.addingUser = true;
+    this.addUserError = '';
+
+    this.authService.register(this.newUser).subscribe({
+      next: () => {
+        this.addingUser = false;
+        this.closeAddUserModal();
+        this.loadUsers(); // Refresh user list
+        alert('✅ User added successfully!');
+      },
+      error: (err) => {
+        this.addingUser = false;
+        this.addUserError = err.error?.message || 'Failed to add user';
+        console.error('Error adding user:', err);
+      }
+    });
   }
 
   goBack(): void {

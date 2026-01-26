@@ -13,6 +13,8 @@ namespace CalculatorAPI.Validators
                 .MaximumLength(50).WithMessage("Username must not exceed 50 characters")
                 .Matches("^[a-zA-Z0-9_]*$").WithMessage("Username can only contain letters, numbers, and underscores");
 
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required");
+
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is required")
                 .MinimumLength(4).WithMessage("Password must be at least 8 characters")

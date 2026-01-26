@@ -60,7 +60,7 @@ export class ResumeService {
   }
 
   getPassedAnalyses(): number {
-    return this.cachedResumeHistory.filter(resume => resume.status === 'Completed').length + 1;
+    return this.cachedResumeHistory.filter(resume => resume.status === 'Completed').length;
   }
   getProcessingAnalyses(): number {
     return this.cachedResumeHistory.filter(resume => resume.status === 'Processing').length;

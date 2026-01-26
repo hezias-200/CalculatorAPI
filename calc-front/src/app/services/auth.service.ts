@@ -119,27 +119,27 @@ export class Auth {
   isAdmin(key: string): boolean {
     const decoded = this.decodeToken(key);
 
-    return decoded && decoded.role === 'Admin';
+    return decoded&& decoded.role && decoded.role === 'Admin';
   }
   handleSessionExpired(): void {
-  if (this.isSessionAlertOpen) return;
-  this.isSessionAlertOpen = true;
+    if (this.isSessionAlertOpen) return;
+    this.isSessionAlertOpen = true;
 
-  Swal.fire({
-    title: 'Session Expired',
-    text: 'Your security token is no longer valid.',
-    icon: 'warning',
-    showCancelButton: false,
-    confirmButtonColor: '#3085d6',
-    confirmButtonText: 'Accept & Login', // This is your button
-    allowOutsideClick: false, // Force them to click the button
-    allowEscapeKey: false
-  }).then((result) => {
-    if (result.isConfirmed) {
-      this.executeLogoutRoutine();
-    }
-  });
-}
+    Swal.fire({
+      title: 'Session Expired',
+      text: 'Your security token is no longer valid.',
+      icon: 'warning',
+      showCancelButton: false,
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Accept & Login', // This is your button
+      allowOutsideClick: false, // Force them to click the button
+      allowEscapeKey: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.executeLogoutRoutine();
+      }
+    });
+  }
   private executeLogoutRoutine(): void {
     this.logout(); // Clears tokens and updates BehaviorSubject
     this.isSessionAlertOpen = false;

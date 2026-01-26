@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { UserService } from '../../services/usermanagment.service';
 import { ResumeAnalysis, ResumeService } from '../../services/resume.service';
 @Component({
@@ -19,36 +19,41 @@ export class Dashboard implements OnInit {
   totalAnalyses: number = 0;
   inProcess: number = 0;
   avgScore: string = '';
-
+  isLoading = signal(true);
   totalUsers = signal(0);
   activeUsers = signal(0);
   adminUsers = signal(0);
   resumes: ResumeAnalysis[] = [];
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef,
     private authService: Auth,
     private userService: UserService,
     private router: Router,
     private resumesService: ResumeService
   ) { }
-
   ngOnInit(): void {
     this.username = this.authService.getUsername() || 'User';
     this.isAdmin = this.authService.isAdmin(this.authService.getToken() || '');
     this.userRole = this.authService.getUserRole(this.authService.getToken() || '') || '';
 
-    if (this.isAdmin) {
+    if (this.isAdmin && isPlatformBrowser(this.platformId)) {
       this.loadUserStats();
       this.loadResumeStats();
       this.totalPassed = this.resumesService.getPassedAnalyses();
+    } else {
+      this.isLoading.set(false);  // Not admin, stop loading
     }
   }
   loadUserStats(): void {
+
     this.userService.getUsers().subscribe({
       next: () => {
         this.totalUsers.set(this.userService.getTotalUsersCount());
         this.activeUsers.set(this.userService.getActiveUsersCount());
         this.adminUsers.set(this.userService.getAdminUsersCount());
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('❌ Error loading user stats:', err);
@@ -56,6 +61,7 @@ export class Dashboard implements OnInit {
     });
   }
   loadResumeStats(): void {
+
     this.resumesService.getHistory().subscribe({
       next: (resumes) => {
         this.resumes = resumes;
@@ -63,6 +69,8 @@ export class Dashboard implements OnInit {
         this.totalAnalyses = this.resumesService.getTotalAnalyses();
         this.inProcess = this.resumesService.getProcessingAnalyses();
         this.avgScore = this.resumesService.getAvgAnalyses();
+        
+        this.cdr.detectChanges();
 
       }
     });

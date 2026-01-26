@@ -15,8 +15,10 @@
         <button class="btn-logout" (click)="logout()">
           <span>Logout</span>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M6 14H3.33333C2.59695 14 2 13.403 2 12.6667V3.33333C2 2.59695 2.59695 2 3.33333 2H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M11.3333 11.3333L14 8M14 8L11.3333 4.66667M14 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 14H3.33333C2.59695 14 2 13.403 2 12.6667V3.33333C2 2.59695 2.59695 2 3.33333 2H6"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M11.3333 11.3333L14 8M14 8L11.3333 4.66667M14 8H6" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </button>
       </div>
@@ -64,8 +66,9 @@
       </div>
       <div class="stat-content">
         <h3>Avg. Match</h3>
-        <p class="stat-number">{{ avgScore }}%</p>
-        <span class="stat-change positive">+5% from last</span>
+        <p class="stat-number" *ngIf="avgScore !== null && avgScore !== undefined">
+          {{ avgScore }}%
+        </p> <span class="stat-change positive">+5% from last</span>
       </div>
     </div>
   </div>
@@ -92,7 +95,7 @@
             <p>View all analyzed resumes</p>
           </div>
           <span class="action-arrow">→</span>
-        </button>        
+        </button>
         <button *ngIf="isAdmin" class="action-btn admin-action" (click)="goToUserManagement()">
           <div class="action-icon">👥</div>
           <div class="action-content">
@@ -101,7 +104,7 @@
           </div>
           <span class="action-arrow">→</span>
         </button>
-           <button class="action-btn">
+        <button class="action-btn">
           <div class="action-icon">⚙️</div>
           <div class="action-content">
             <h3>Settings</h3>
@@ -117,13 +120,13 @@
       <h2 class="card-title">Recent Activity</h2>
       <div class="activity-list">
         <div class="activity-item" *ngFor="let resume of resumes.slice(0,4); let i = index">
-          <div class="activity-icon"              [ngClass]="{
+          <div class="activity-icon" [ngClass]="{
                  'success': resume.status.toLowerCase() === 'completed',
                  'processing': resume.status.toLowerCase() === 'processing',
                  'warning': resume.status.toLowerCase() === 'failed'
                }">
-            {{ resume.status.toLowerCase() === 'completed' ? '✓' : 
-               resume.status.toLowerCase() === 'processing' ? '⏳' : '!' }}
+            {{ resume.status.toLowerCase() === 'completed' ? '✓' :
+            resume.status.toLowerCase() === 'processing' ? '⏳' : '!' }}
           </div>
           <div class="activity-content">
             <h4>{{ resume.status === 'Completed' ? 'Resume Analyzed' : 'Analysis ' + resume.status }}</h4>

@@ -32,13 +32,13 @@ export class UserService {
   }
 
   getAdminUsersCount(): number {
-    return this.cachedUsers.filter(u => u.role === 'Admin').length;
+    return this.cachedUsers.filter(u => u.role === 'admin').length;
   }
 
   getTotalUsersCount(): number {
     return this.cachedUsers.length;
   }
-    goToUserManagement(): void {
+  goToUserManagement(): void {
     this.router.navigate(['/user-management']);
   }
 }

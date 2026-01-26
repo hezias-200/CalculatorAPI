@@ -5,7 +5,6 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using FluentValidation;
-
 using CalculatorAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -41,16 +40,18 @@ namespace CalculatorAPI.Controllers
                 return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
             }
 
-            if (!await _userRepository.IsUsernameUniqueAsync(model.Username))
+            if (!await _userRepository.IsEmailUniqueAsync(model.Email))
             {
-                return BadRequest("Username already exists");
+                return BadRequest("Email already exists");
             }
 
             var user = new UserModel
             {
                 Username = model.Username,
+                Email = model.Email,
+
                 PasswordHash = HashPassword(model.Password),
-                Role = "Admin",
+                Role = model.Role,
                 IsActive = true
             };
 
@@ -64,8 +65,7 @@ namespace CalculatorAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await _userRepository.FindAsync(u =>
-                u.Username == model.Username &&
-                u.IsActive == true);
+                u.Username == model.Username &&  u.IsActive == true );
 
             if (user == null || !VerifyPassword(model.Password, user.PasswordHash))
             {
@@ -74,7 +74,7 @@ namespace CalculatorAPI.Controllers
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new { token, user.Username });
+            return Ok(new { token, user.Username,user.Email });
         }
 
         [HttpDelete("users/{username}")]

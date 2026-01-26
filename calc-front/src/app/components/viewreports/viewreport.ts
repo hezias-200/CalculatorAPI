@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule,isPlatformBrowser  } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ResumeService, ResumeAnalysis } from '../../services/resume.service';
 
@@ -14,13 +14,13 @@ import { ResumeService, ResumeAnalysis } from '../../services/resume.service';
 export class ViewReports implements OnInit {
   reports: ResumeAnalysis[] = [];
   filteredReports: ResumeAnalysis[] = [];
-  
+
   // Stats
   totalAnalyses: number = 0;
   passedAnalyses: number = 0;
   belowThreshold: number = 0;
   averageScore: number = 0;
-  
+
   // Filters
   filterStatus: string = '';
   filterScore: string = '';
@@ -28,12 +28,16 @@ export class ViewReports implements OnInit {
   filterDateTo: string = '';
 
   constructor(
+      @Inject(PLATFORM_ID) private platformId: Object,
     private resumeService: ResumeService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.loadReports();
+    if (isPlatformBrowser(this.platformId)) {
+
+      this.loadReports();
+    }
   }
 
   loadReports(): void {
@@ -51,13 +55,13 @@ export class ViewReports implements OnInit {
     this.totalAnalyses = this.reports.length;
     this.passedAnalyses = this.reports.filter(r => (r.compatibilityScore || 0) >= 70).length;
     this.belowThreshold = this.reports.filter(r => (r.compatibilityScore || 0) < 70).length;
-    
+
     const scores = this.reports
       .filter(r => r.compatibilityScore)
       .map(r => r.compatibilityScore!);
-    
-    this.averageScore = scores.length > 0 
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) 
+
+    this.averageScore = scores.length > 0
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
       : 0;
   }
 
@@ -112,7 +116,7 @@ export class ViewReports implements OnInit {
 
   deleteReport(id: number): void {
     if (!confirm('Delete this report?')) return;
-    
+
     this.resumeService.deleteAnalysis(id).subscribe({
       next: () => {
         this.loadReports();

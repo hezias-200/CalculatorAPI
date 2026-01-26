@@ -6,7 +6,7 @@ namespace CalculatorAPI.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<UserModel> Users { get; set; }
-        public DbSet<ResumeAnalysisModel> ResumeAnalyses { get; set; }  // ✅ Add this
+        public DbSet<ResumeAnalysisModel> ResumeAnalyses { get; set; }  
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -18,7 +18,7 @@ namespace CalculatorAPI.Data
 
             // User unique constraint
             modelBuilder.Entity<UserModel>()
-                .HasIndex(u => u.Username)
+                .HasIndex(u => u.Email)
                 .IsUnique();
 
             // Resume analysis indexes

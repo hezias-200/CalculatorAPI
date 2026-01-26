@@ -62,6 +62,23 @@
     <button class="btn-retry" (click)="loadUsers()">Try Again</button>
   </div>
 
+<!--   
+  ✅ Add User Modal -->
+<div *ngIf="showAddUserModal" 
+     class="modal-overlay-wrapper" 
+     (click)="closeAddUserModal()">
+  <div class="modal-content-wrapper" 
+       (click)="$event.stopPropagation()">
+    <app-register  
+      [isModal]="true"
+      [hideTerms]="true"
+      (onRegisterSuccess)="onUserAdded()"
+      (onCancel)="closeAddUserModal()">
+    </app-register>
+  </div>
+</div>
+
+
   <!-- Users Table -->
   <div *ngIf="!loading && hasUsers" class="users-section">
     <div class="section-header">
@@ -73,7 +90,7 @@
           </svg>
           <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" placeholder="Search users...">
         </div>
-        <button class="btn-add">
+        <button class="btn-add" (click)="showAddUserModalPopup()">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
             <path d="M8 3v10M3 8h10"/>
           </svg>
@@ -108,7 +125,7 @@
                 </div>
                 <div class="user-details">
                   <span class="user-name">{{ user.username }}</span>
-                  <span class="user-email">user@example.com</span>
+                  <span class="user-email">user1@example.com</span>
                 </div>
               </div>
             </td>
