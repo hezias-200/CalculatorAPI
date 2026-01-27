@@ -66,11 +66,13 @@ export class ResumeService {
     return this.cachedResumeHistory.filter(resume => resume.status === 'Processing').length;
   }
   getAvgAnalyses(): string {
-    return ((this.getPassedAnalyses() / this.getTotalAnalyses()) * 100).toFixed(2);
+    const total = this.getPassedAnalyses() / this.getTotalAnalyses();
+
+    return total ? ((total * 100).toFixed(2)) : '0.00';
 
   }
   getTotalAnalyses(): number {
-    return this.cachedResumeHistory.length + 1;
+    return this.cachedResumeHistory.length;
   }
 
   deleteAnalysis(id: number): Observable<any> {
