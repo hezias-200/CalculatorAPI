@@ -1,6 +1,6 @@
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule,isPlatformBrowser  } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ResumeService, ResumeAnalysis } from '../../services/resume.service';
 
@@ -28,14 +28,15 @@ export class ViewReports implements OnInit {
   filterDateTo: string = '';
 
   constructor(
-      @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef,
+
     private resumeService: ResumeService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-
       this.loadReports();
     }
   }
@@ -46,6 +47,8 @@ export class ViewReports implements OnInit {
         this.reports = reports;
         this.filteredReports = reports;
         this.calculateStats();
+        this.cdr.detectChanges();
+
       },
       error: (err) => console.error('Error loading reports:', err)
     });
